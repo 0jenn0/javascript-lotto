@@ -1,40 +1,38 @@
-import ERROR from "../constants/error.js";
-import { LOTTO_LENGTH, LOTTO_RANGE } from "../constants/option.js";
+import ERROR_MESSAGE from '../constants/error-messages.js';
+import { LOTTO_NUMBER_LENGTH, LOTTO_NUMBER_RANGE } from '../constants/lotto-constants.js';
+import AppError from '../utils/appError.js';
 
 const lottoNumberValidator = {
   validateNumbersLength(numbers) {
-    if (numbers.length !== LOTTO_LENGTH) {
-      throw new Error(ERROR.INVALID_LOTTO_NUMBER_LENGTH);
+    if (numbers.length !== LOTTO_NUMBER_LENGTH) {
+      throw new AppError(ERROR_MESSAGE.INVALID_LOTTO_NUMBER_LENGTH);
     }
   },
 
   validateDuplicate(numbers) {
-    if (new Set(numbers).size !== LOTTO_LENGTH) {
-      throw new Error(ERROR.INVALID_LOTTO_NUMBER_DUPLICATE);
+    if (new Set(numbers).size !== LOTTO_NUMBER_LENGTH) {
+      throw new AppError(ERROR_MESSAGE.INVALID_LOTTO_NUMBER_DUPLICATE);
     }
   },
 
   validateRange(numbers) {
-    if (
-      numbers.some(
-        (number) => number < LOTTO_RANGE.MIN || number > LOTTO_RANGE.MAX,
-      )
-    ) {
-      throw new Error(ERROR.INVALID_LOTTO_NUMBER_RANGE);
+    if (numbers.some((number) => number < LOTTO_NUMBER_RANGE.MIN || number > LOTTO_NUMBER_RANGE.MAX)) {
+      throw new AppError(ERROR_MESSAGE.INVALID_LOTTO_NUMBER_RANGE);
     }
   },
 
-  validateType(numbers) {
+  validateIsNumber(numbers) {
     if (numbers.some((number) => !Number.isInteger(number))) {
-      throw new Error(ERROR.INVALID_LOTTO_NUMBER_TYPE);
+      throw new AppError(ERROR_MESSAGE.INVALID_LOTTO_NUMBER_TYPE);
     }
   },
 
   validate(numbers) {
-    this.validateNumbersLength(numbers);
-    this.validateDuplicate(numbers);
-    this.validateRange(numbers);
-    this.validateType(numbers);
+    const formatedNumbers = numbers.map(Number);
+    this.validateNumbersLength(formatedNumbers);
+    this.validateDuplicate(formatedNumbers);
+    this.validateRange(formatedNumbers);
+    this.validateIsNumber(formatedNumbers);
   },
 };
 

@@ -1,35 +1,32 @@
-import { LOTTO_LENGTH, LOTTO_RANGE } from "../constants/option.js";
-import { LOTTO_PRICE } from "../constants/system.js";
+import { LOTTO_NUMBER_LENGTH, LOTTO_NUMBER_RANGE, LOTTO_PRICE } from '../constants/lotto-constants.js';
+import createUniqueNumbersInRange from '../utils/createUniqueNumbersInRange.js';
+import commonValidator from '../validator/commonValidator.js';
+import purchaseAmountValidator from '../validator/purchaseAmountValidator.js';
 
-import Lotto from "./Lotto.js";
+import Lotto from './lotto.js';
 
-class LottoMachine {
-  #purchaseAmount;
+const lottoMachine = {
+  checkPurchaseAmount: (purchaseAmount) => {
+    commonValidator.validate(purchaseAmount);
+    purchaseAmountValidator.validate(purchaseAmount);
 
-  constructor(purchaseAmount) {
-    this.#purchaseAmount = purchaseAmount;
-  }
+    return Number(purchaseAmount);
+  },
 
-  makeLottos() {
-    const lottoCount = this.#purchaseAmount / LOTTO_PRICE;
-
-    const lottoList = Array.from(
-      { length: lottoCount },
-      () => new Lotto(this.#generateLotto()),
+  makeLottos: (purchaseAmount) => {
+    const validatedPurchaseAmount = lottoMachine.checkPurchaseAmount(purchaseAmount);
+    return Array.from(
+      { length: validatedPurchaseAmount / LOTTO_PRICE },
+      () =>
+        new Lotto(
+          createUniqueNumbersInRange({
+            start: LOTTO_NUMBER_RANGE.MIN,
+            end: LOTTO_NUMBER_RANGE.MAX,
+            count: LOTTO_NUMBER_LENGTH,
+          }),
+        ),
     );
+  },
+};
 
-    return lottoList;
-  }
-
-  #generateLotto() {
-    const range = Array.from({ length: LOTTO_RANGE.MAX }, (_, i) => i + 1);
-    const shuffled = range
-      .map((value) => ({ value, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value)
-      .slice(0, LOTTO_LENGTH);
-
-    return shuffled;
-  }
-}
-export default LottoMachine;
+export default lottoMachine;
